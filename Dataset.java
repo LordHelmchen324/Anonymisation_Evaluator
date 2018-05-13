@@ -20,7 +20,7 @@ class Dataset {
         for (Trajectory r : original.trajectories) this.add(new Trajectory(r));
     }
 
-    public static fromJSON(String jsonFilePath) {
+    public static Dataset fromJSON(String jsonFilePath) {
         File datasetFile = new File(jsonFilePath);
         try (BufferedReader r = new BufferedReader(new FileReader(datasetFile))) {
             System.out.print("Reading data set from JSON file ... ");
