@@ -20,6 +20,28 @@ class Dataset {
         for (Trajectory r : original.trajectories) this.add(new Trajectory(r));
     }
 
+    public static fromJSON(String jsonFilePath) {
+        File datasetFile = new File(jsonFilePath);
+        try (BufferedReader r = new BufferedReader(new FileReader(datasetFile))) {
+            System.out.print("Reading data set from JSON file ... ");
+
+            Gson gson = new Gson();
+            Dataset d = gson.fromJson(r, Dataset.class);
+
+            System.out.print("done!\n");
+            System.out.println(" -> Size of the data set = " + d.size() + "\n");
+
+            return d;
+        } catch (FileNotFoundException e) {
+            System.err.println("Could not find file at path \"" + datasetFile.getName() + "\".");
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("An I/O exception occured: " + e.getLocalizedMessage());
+            System.exit(1);
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         final String lineSeperator = "--------------";
