@@ -6,6 +6,9 @@ public class Evaluator {
 
 		double dr = DisclosureRisk.computeViaRecordLinkage(o, p);
 		double il = InformationLoss.compute(o, p);
+
+		System.out.println("Disclosure risk: " + dr);
+		System.out.println("Information loss: " + il);
 		
 		Plotter.plotRUMap(dr, il);
 	}
