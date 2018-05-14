@@ -8,12 +8,14 @@ class DisclosureRisk {
 
         double euSum = 0.0;
         double stsSum = 0.0;
+        int n = 0;
         for (Trajectory[] pair : lp) {
             euSum += eu.computeDistance(pair[0], pair[1]);
             stsSum += sts.computeDistance(pair[0], pair[1]);
+            n = pair[0].length();
         }
 
-        return Math.max(euSum, stsSum) / lp.length;
+        return Math.max(euSum, stsSum) / (lp.length * n);
     }
 
     private static Trajectory[][] linkTrajectories(Dataset o, Dataset p) {
