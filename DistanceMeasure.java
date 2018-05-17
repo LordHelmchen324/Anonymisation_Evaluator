@@ -1,6 +1,8 @@
+import java.util.List;
+
 public interface DistanceMeasure {
 
-    void createSupportData(Dataset d);
+    public void createSupportData(List<Dataset> ds);
 
     void removeImpossibleTrajectoriesFromDataset(Dataset d);
 

@@ -4,7 +4,7 @@ import java.util.List;
 public class ShortTimeSeriesDistance implements DistanceMeasure {
 
     @Override
-	public void createSupportData(Dataset d) { }
+	public void createSupportData(List<Dataset> ds) { }
 
 	@Override
 	public void removeImpossibleTrajectoriesFromDataset(Dataset d) { }

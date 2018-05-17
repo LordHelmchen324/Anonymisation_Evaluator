@@ -1,6 +1,7 @@
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -10,38 +11,37 @@ public class SynchronisedDistance implements DistanceMeasure {
     private double[][] shortestDistanceMatrix;
 
     @Override
-	public void createSupportData(Dataset d) {
+	public void createSupportData(List<Dataset> ds) {
         System.out.println(" -> SynchronisedDistance: Creating support data ...");
 
-        System.out.println("    > Assigning indicies as IDs to the trajectories ...");
-        int i = 0;
-        for (Trajectory r : d.getTrajectories()) {
-            r.id = i;
-            i++;
+        List<Dataset> dsCopies = new LinkedList<Dataset>();
+        for (Dataset d : ds) {
+            System.out.println("    > Copying dataset ... ");
+            dsCopies.add(new Dataset(d));
         }
 
-        System.out.println("    > Copying dataset ... ");
-        Dataset temp = new Dataset(d);
+        List<Trajectory> all = new LinkedList<Trajectory>();
+        for (Dataset d : dsCopies) all.addAll(d.getTrajectories());
 
         System.out.println("    > Synchronising trajectories ...");
-        SynchronisedDistance.synchroniseTrajectories(temp);
+        SynchronisedDistance.synchroniseTrajectories(all);
 
         System.out.println("    > Building distance graph ...");
-        this.distanceGraph = SynchronisedDistance.makeDistanceGraph(temp);
+        this.distanceGraph = SynchronisedDistance.makeDistanceGraph(all);
 
         System.out.println("    > Computing shortest distance matrix ...");
         this.shortestDistanceMatrix = SynchronisedDistance.computeShortestDistanceMatrix(this.distanceGraph);
     }
 
-    private static void synchroniseTrajectories(Dataset d) {
+    private static void synchroniseTrajectories(List<Trajectory> rs) {
         // Get a set of all timestamps of all existing places within the data set
         System.out.println("      > Getting set of all timestamps ...");
         Set<Long> ts = new HashSet<Long>();
-        for (Trajectory tj : d.getTrajectories()) {
-            ts.addAll(tj.getTimestamps());
+        for (Trajectory r : rs) {
+            ts.addAll(r.getTimestamps());
         }
-
-        for (Trajectory r : d.getTrajectories()) {
+        
+        for (Trajectory r : rs) {
             System.out.println("      > Synchronising trajectory of length " + r.length() + " ...");
 
             long minT = Collections.min(r.getTimestamps());
@@ -74,13 +74,11 @@ public class SynchronisedDistance implements DistanceMeasure {
         }
     }
 
-    private static double[][] makeDistanceGraph(Dataset temp) {
-        List<Trajectory> trajectories = temp.getTrajectories();
+    private static double[][] makeDistanceGraph(List<Trajectory> rs) {
+        double[][] distanceGraph = new double[rs.size()][rs.size()];
 
-        double[][] distanceGraph = new double[trajectories.size()][trajectories.size()];
-
-        for (Trajectory r : trajectories) {
-            for (Trajectory s : trajectories) {
+        for (Trajectory r : rs) {
+            for (Trajectory s : rs) {
                 double d;
 
                 if (s == r) {
