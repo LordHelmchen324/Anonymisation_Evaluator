@@ -10,11 +10,13 @@ class InformationLoss {
         double il12 = InformationLoss.averageDifferenceAutocorrelation(o, p);
         double il1 = (il11 + il12) / 2;
 
-        double il2 = InformationLoss.averageAbsoluteDifference(o, p);
+        /*double il2 = InformationLoss.averageAbsoluteDifference(o, p);
 
         double il3 = InformationLoss.spaceDistortion(o, p);
 
         return (il1 + il2 + il3) / 3;    // TODO: Is that correct?
+        */
+        return il1;
     }
 
     // IL_1.1
