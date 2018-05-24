@@ -1,9 +1,9 @@
 public class Evaluator {
 
 	public static void main(String[] args) {
-		Dataset o = Dataset.fromJSON("../Anonymiser/randomPerfect1000.json");
-		Dataset p = Dataset.fromJSON("../Anonymiser/randomPerfect1000_Result.json");
-
+		Dataset o = Dataset.fromJSON("../Geolife Trajectories 1.3/MS_GeoLife_pandas-downsampled.json");
+		Dataset p = Dataset.fromJSON("../Geolife Trajectories 1.3/MS_GeoLife_pandas-downsampled_PROTECTED.json");
+		
 		double dr = DisclosureRisk.computeViaRecordLinkage(o, p);
 		double il = InformationLoss.compute(o, p);
 

@@ -3,9 +3,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.google.gson.Gson;
 
@@ -87,6 +89,24 @@ class Dataset {
 
     public int size() {
         return this.trajectories.size();
+    }
+
+    public int numberOfRecords() {
+        int sum = 0;
+        for (Trajectory r : this.trajectories) sum += r.length();
+        return sum; 
+    }
+
+    public int numberOfRecordedTimestamps() {
+        Set<Long> ts = new HashSet<Long>();
+        for (Trajectory r : this.trajectories) ts.addAll(r.getTimestamps());
+        return ts.size();
+    }
+
+    public Set<Long> recordedTimestamps() {
+        Set<Long> ts = new HashSet<Long>();
+        for (Trajectory r : this.trajectories) ts.addAll(r.getTimestamps());
+        return ts;
     }
 
     public Trajectory getTrajectoryById(int id) {

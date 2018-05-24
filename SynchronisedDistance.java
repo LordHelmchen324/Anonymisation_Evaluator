@@ -53,6 +53,8 @@ public class SynchronisedDistance implements DistanceMeasure {
                 if (minT < t && t < maxT) {
                     // If the trajectory has no place for timestamp t ... add an interpolated one
                     if (!r.getTimestamps().contains(t)) {
+                        System.out.println("        > Interpolating at " + t);
+
                         long timeBefore = minT;
                         for (long rT: r.getTimestamps()) {
                             if (rT < t && (t - rT < t - timeBefore || timeBefore == -1)) timeBefore = rT;
