@@ -1,11 +1,6 @@
 class InformationLoss {
 
     public static double compute(Dataset o, Dataset p) {
-        if (o.size() != p.size()) {
-            System.err.println("ERROR: Tried to compute information loss of different sized original and protected Datasets!");
-            System.exit(-1);
-        }
-
         double il11 = InformationLoss.averageDifferenceMeans(o, p);
         double il12 = InformationLoss.averageDifferenceAutocorrelation(o, p);
         double il1 = (il11 + il12) / 2;
@@ -14,8 +9,9 @@ class InformationLoss {
 
         double il3 = InformationLoss.spaceDistortion(o, p);
 
-        return (il1 + il2 + il3) / 3;    // TODO: Is that correct?
+        return (il1 + il2 + il3) / 3;
         */
+
         return il1;
     }
 
@@ -27,8 +23,8 @@ class InformationLoss {
         for (Trajectory ro : o.getTrajectories()) {
             Trajectory rp = p.getTrajectoryById(ro.id);
             if (rp == null) {
-                System.err.println("Protected data set does not contain trajectory with id = " + ro.id +" from the original data set!");
-                System.exit(-1);
+                sum += 2.0;     // TODO: Is that correct?
+                continue;
             }
 
             double myxro = ro.averageX();
@@ -59,6 +55,11 @@ class InformationLoss {
 
         for (Trajectory ro : o.getTrajectories()) {
             Trajectory rp = p.getTrajectoryById(ro.id);
+            if (rp == null) {
+                sum += 4.0;     // TODO: Is that correct?
+                continue;
+            }
+
             int n = ro.length();
 
             double[] hs = { 0.0, (double)n / 4.0, (double)n / 2.0, 3 * (double)n / 4.0 };
