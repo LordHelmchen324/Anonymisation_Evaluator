@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,25 +14,29 @@ class DisclosureRisk {
         for (Trajectory r : tempp.getTrajectories()) r.id = r.id * 2 + 1;
 
         // Remove all duplicates from the protected data set and keep a dictionary about which representative remains
+        Dataset reps = new Dataset();
         Map<Integer, Integer> clusterRepDict = new HashMap<Integer, Integer>();
-        Iterator<Trajectory> repIt = tempp.getTrajectories().iterator();
-        while (repIt.hasNext()) {
-            Trajectory rep = repIt.next();
-
-            Iterator<Trajectory> repedIt = tempp.getTrajectories().iterator();
-            while(repedIt.hasNext()) {
-                Trajectory reped = repedIt.next();
-
-                if (reped.equals(rep)) {
-                    clusterRepDict.put(reped.id, rep.id);
-                    tempp.remove(reped);
+        for (Trajectory r : tempp.getTrajectories()) {
+            boolean containsEqual = false;
+            int equalId = -1;
+            for (Trajectory s : reps.getTrajectories()) {
+                if (s.equals(r)) {
+                    containsEqual = true;
+                    equalId = s.id;
                 }
             }
+
+            if (!containsEqual) {
+                reps.add(r);
+                equalId = r.id;
+            }
+
+            clusterRepDict.put(r.id, equalId);
         }
 
         // Create and prepare the synchronised distance
         DistanceMeasure dM = new SynchronisedDistance();
-        List<Dataset> ds = new LinkedList<Dataset>(); ds.add(tempo); ds.add(tempp);
+        List<Dataset> ds = new LinkedList<Dataset>(); ds.add(tempo); ds.add(reps);
         dM.createSupportData(ds);
 
         // Link trajectories
@@ -42,7 +45,7 @@ class DisclosureRisk {
         for (Trajectory ro : tempo.getTrajectories()) {
             Trajectory closest = null;
             double closestDistance = Double.POSITIVE_INFINITY;
-            for (Trajectory rp : tempp.getTrajectories()) {
+            for (Trajectory rp : reps.getTrajectories()) {
                 double distance = dM.computeDistance(ro, rp);
 
                 if (closest == null || distance < closestDistance) {
