@@ -63,7 +63,8 @@ class DisclosureRisk {
         // Count how many were linked to a trajectory just like their protected version
         int linkedCount = 0;
         for (Trajectory[] pair : lps) {
-            if (clusterRepDict.get(pair[0].id + 1) == pair[1].id) linkedCount++;
+            Integer expectedClosest = clusterRepDict.get(pair[0].id + 1);
+            if (expectedClosest != null && expectedClosest == pair[1].id) linkedCount++;
         }
 
         return linkedCount / lps.length;
