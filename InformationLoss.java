@@ -62,7 +62,7 @@ class InformationLoss {
 
             int n = ro.length();
 
-            double[] hs = { 0.0, (double)n / 4.0, (double)n / 2.0, 3 * (double)n / 4.0 };
+            double[] hs = { 0.0, (double)n / 4.0, (double)n / 2.0, 3 * (double)n / 4.0 };   // TODO: eigentlich haben beie Trajectories ja unterschiedliche n
             for (double h : hs) {
                 double rhoo = ro.autocorrelation(h);        // TODO: kommt hier für 0 nicht immer 1 raus?
                 double rhop = rp.autocorrelation(h);
