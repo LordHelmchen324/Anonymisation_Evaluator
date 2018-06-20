@@ -1,10 +1,8 @@
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class SynchronisedDistance implements DistanceMeasure {
@@ -12,48 +10,33 @@ public class SynchronisedDistance implements DistanceMeasure {
     private double[][] distanceGraph;
     private double[][] shortestDistanceMatrix;
 
-    private Map<Integer, Integer> idToIndexDict = new HashMap<Integer, Integer>();
-
     @Override
 	public void createSupportData(List<Dataset> ds) {
-        System.out.println(" -> SynchronisedDistance: Creating support data ...");
-
-        // Create temporary copies of the data sets and pull all Trajectories from them
+        System.out.print("Copying data sets ...");
         List<Dataset> dsCopies = new LinkedList<Dataset>();
         for (Dataset d : ds) {
-            System.out.println("    > Copying dataset ... ");
             dsCopies.add(new Dataset(d));
         }
+        System.out.print("\rCopied data sets       \n");
+
         List<Trajectory> all = new LinkedList<Trajectory>();
         for (Dataset d : dsCopies) all.addAll(d.getTrajectories());
 
-        // Map IDs to indicies for building the distance graph
-        int i = 0;
-        for (Trajectory r : all) {
-            this.idToIndexDict.put(r.id, i);
-            i++;
-        }
-
-        System.out.println("    > Synchronising trajectories ...");
         SynchronisedDistance.synchroniseTrajectories(all);
-
-        System.out.println("    > Building distance graph ...");
-        this.distanceGraph = SynchronisedDistance.makeDistanceGraph(all, this.idToIndexDict);
-
-        System.out.println("    > Computing shortest distance matrix ...");
+        this.distanceGraph = SynchronisedDistance.makeDistanceGraph(all);
         this.shortestDistanceMatrix = SynchronisedDistance.computeShortestDistanceMatrix(this.distanceGraph);
     }
 
     private static void synchroniseTrajectories(List<Trajectory> rs) {
         // Get a set of all timestamps of all existing places within the data set
-        System.out.println("      > Getting set of all timestamps ...");
         Set<Long> ts = new HashSet<Long>();
         for (Trajectory r : rs) {
             ts.addAll(r.getTimestamps());
         }
         
+        int synchronised = 1;
         for (Trajectory r : rs) {
-            System.out.println("      > Synchronising trajectory of length " + r.length() + " ...");
+            System.out.print("\rSynchronised trajectories ... " + synchronised);
 
             long minT = Collections.min(r.getTimestamps());
             long maxT = Collections.max(r.getTimestamps());
@@ -64,8 +47,6 @@ public class SynchronisedDistance implements DistanceMeasure {
                 if (minT < t && t < maxT) {
                     // If the trajectory has no place for timestamp t ... add an interpolated one
                     if (!r.getTimestamps().contains(t)) {
-                        System.out.println("        > Interpolating at " + t);
-
                         long timeBefore = minT;
                         for (long rT: r.getTimestamps()) {
                             if (rT < t && (t - rT < t - timeBefore || timeBefore == -1)) timeBefore = rT;
@@ -84,13 +65,21 @@ public class SynchronisedDistance implements DistanceMeasure {
                     }
                 }
             }
+
+            synchronised++;
         }
+
+        System.out.print("\n");
     }
 
-    private static double[][] makeDistanceGraph(List<Trajectory> rs, Map<Integer, Integer> idToIndexDict) {
+    private static double[][] makeDistanceGraph(List<Trajectory> rs) {
         double[][] distanceGraph = new double[rs.size()][rs.size()];
 
+        int builtIn = 1;
         for (Trajectory r : rs) {
+            double percentage = builtIn * 100 / rs.size();
+            System.out.print("\rBuilding distance graph ... " + percentage + "%");
+
             for (Trajectory s : rs) {
                 double d;
 
@@ -102,9 +91,13 @@ public class SynchronisedDistance implements DistanceMeasure {
                     d = Double.POSITIVE_INFINITY;
                 }
 
-                distanceGraph[idToIndexDict.get(r.id)][idToIndexDict.get(s.id)] = distanceGraph[idToIndexDict.get(s.id)][idToIndexDict.get(r.id)] = d;
+                distanceGraph[r.id][s.id] = distanceGraph[s.id][r.id] = d;
             }
+
+            builtIn++;
         }
+
+        System.out.print("\rBuilt distance graph\n");
 
         return distanceGraph;
     }
@@ -146,6 +139,9 @@ public class SynchronisedDistance implements DistanceMeasure {
         }
 
         for (int k = 0; k < n; k++) {
+            double percentage = (k + 1) * 100 / n;
+            System.out.print("\rComputing shortest distance matrix ... " + percentage + "%");
+
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     if (distanceGraph[i][k] + distanceGraph[k][j] < distanceGraph[i][j]) {
@@ -155,11 +151,17 @@ public class SynchronisedDistance implements DistanceMeasure {
             }
         }
 
+        System.out.print("\rComputed shortest distance matrix      \n");
+
         return distanceGraph;
     }
 
     @Override
 	public void removeImpossibleTrajectoriesFromDataset(Dataset d) {
+        System.out.print("\rRemoving unreachable trajectories ...");
+
+        int sizeBefore = d.size();
+
         int[] visitedMask = new int[d.size()];
         for (int i = 0; i < visitedMask.length; i++) visitedMask[i] = -1;
 
@@ -188,6 +190,8 @@ public class SynchronisedDistance implements DistanceMeasure {
                 }
             }
         }
+
+        System.out.print("\rRemoved unreachable trajectories ... " + (d.size() - sizeBefore) + "\n");
     }
     
     public int depthFirstSearch(int v, int c, int[] visitedMask) {
@@ -207,7 +211,7 @@ public class SynchronisedDistance implements DistanceMeasure {
 
 	@Override
 	public double computeDistance(Trajectory r, Trajectory s) {
-        return this.shortestDistanceMatrix[this.idToIndexDict.get(r.id)][this.idToIndexDict.get(s.id)];
+        return this.shortestDistanceMatrix[r.id][s.id];
 	}
 
 }

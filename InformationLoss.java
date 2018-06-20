@@ -20,7 +20,10 @@ class InformationLoss {
         int s = o.size();
 
         double sum = 0.0;
+        int computed = 1;
         for (Trajectory ro : o.getTrajectories()) {
+            System.out.print("\rInformation loss: Computing IL_1.1 ... " + (computed * 100 / o.size()) + "%");
+
             Trajectory rp = p.getTrajectoryById(ro.id);
             if (rp == null) {
                 sum += 2.0;     // TODO: Is that correct?
@@ -42,7 +45,10 @@ class InformationLoss {
             if (b2 != 0) b = b1 / b2; 
 
             sum += a + b;
+
+            computed++;
         }
+        System.out.print("\n");
 
         return sum / (2 * s);
     }
@@ -52,8 +58,10 @@ class InformationLoss {
         int s = o.size();
 
         double sum = 0.0;
-
+        int computed = 1;
         for (Trajectory ro : o.getTrajectories()) {
+            System.out.print("\rInformation loss: Computing IL_1.1 ... " + (computed * 100 / o.size()) + "%");
+
             Trajectory rp = p.getTrajectoryById(ro.id);
             if (rp == null) {
                 sum += 4.0;     // TODO: Is that correct?
@@ -69,7 +77,10 @@ class InformationLoss {
 
                 sum += Math.abs(rhoo - rhop) / Math.max(Math.abs(rhoo), Math.abs(rhop));    // Autocorrelation won't be 0 for all h in hs
             }
+
+            computed++;
         }
+        System.out.print("\n");
 
         return sum / (4 * s);
     }

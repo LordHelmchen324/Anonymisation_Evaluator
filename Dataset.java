@@ -29,8 +29,7 @@ class Dataset {
             Gson gson = new Gson();
             Dataset d = gson.fromJson(r, Dataset.class);
 
-            System.out.print("done!\n");
-            System.out.println(" -> Size of the data set = " + d.size() + "\n");
+            System.out.print("\rData set was read from JSON file: "+ d.size() + " trajectories\n");
 
             return d;
         } catch (FileNotFoundException e) {
@@ -128,8 +127,6 @@ class Dataset {
             System.exit(1);
         }
 
-        System.out.print("      > Finding closest trajectory ... ");
-
         double minDistance = Double.MAX_VALUE;
         Trajectory closest = null;
         for (Trajectory s : this.trajectories) {
@@ -140,8 +137,6 @@ class Dataset {
             }
         }
 
-        System.out.print("done!\n");
-
         return closest;
     }
 
@@ -150,8 +145,6 @@ class Dataset {
             System.err.println("Cannot return furthest Trajectory to t = " + r + " from within empty Dataset!");
             System.exit(1);
         }
-
-        System.out.print("      > Finding furthest trajectory ... ");
 
         double maxDistance = 0.0;
         Trajectory furthest = null;
@@ -162,9 +155,7 @@ class Dataset {
                 furthest = s;
             }
         }
-
-        System.out.print("done!\n");
-
+        
         return furthest;
     }
 
