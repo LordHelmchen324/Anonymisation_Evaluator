@@ -1,7 +1,5 @@
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 class DisclosureRisk {
 
@@ -17,36 +15,9 @@ class DisclosureRisk {
         for (Trajectory r : tempp.getTrajectories()) r.id = r.id * 2 + 1;
         System.out.print("\rDisclosure risk: Assigned new IDs       \n");
 
-        // Remove all duplicates from the protected data set and keep a dictionary about which representative remains
-        Dataset reps = new Dataset();
-        Map<Integer, Integer> clusterRepDict = new HashMap<Integer, Integer>();
-        int duplDone = 1;
-        for (Trajectory r : tempp.getTrajectories()) {
-            System.out.print("\rDisclosure risk: Removing duplicates ... " + (duplDone * 100 / tempp.size()) + "%");
-
-            boolean containsEqual = false;
-            int equalId = -1;
-            for (Trajectory s : reps.getTrajectories()) {
-                if (s.equals(r)) {
-                    containsEqual = true;
-                    equalId = s.id;
-                }
-            }
-
-            if (!containsEqual) {
-                reps.add(r);
-                equalId = r.id;
-            }
-
-            clusterRepDict.put(r.id, equalId);
-
-            duplDone++;
-        }
-        System.out.print("\n");
-
         // Create and prepare the synchronised distance
         DistanceMeasure dM = new SynchronisedDistance();
-        List<Dataset> ds = new LinkedList<Dataset>(); ds.add(tempo); ds.add(reps);
+        List<Dataset> ds = new LinkedList<Dataset>(); ds.add(tempo); ds.add(tempp);
         dM.createSupportData(ds);
 
         // Link trajectories
@@ -57,7 +28,7 @@ class DisclosureRisk {
 
             Trajectory closest = null;
             double closestDistance = Double.POSITIVE_INFINITY;
-            for (Trajectory rp : reps.getTrajectories()) {
+            for (Trajectory rp : tempp.getTrajectories()) {
                 double distance = dM.computeDistance(ro, rp);
 
                 if (closest == null || distance < closestDistance) {
@@ -76,10 +47,10 @@ class DisclosureRisk {
         // Count how many were linked to a trajectory just like their protected version
         int linkedCount = 0;
         for (Trajectory[] pair : lps) {
-            System.out.print("\rDisclosure risk: Correctly linked trajectories ... " + linkedCount);
+            System.out.print("\rDisclosure risk: Correctly linked trajectories ... " + linkedCount + " / " + tempo.size());
 
-            Integer expectedClosest = clusterRepDict.get(pair[0].id + 1);
-            if (expectedClosest != null && expectedClosest == pair[1].id) linkedCount++;
+            Trajectory actualProtected = tempp.getTrajectoryById(pair[0].id + 1);
+            if (actualProtected != null && pair[1].equals(actualProtected)) linkedCount++;
         }
         System.out.print("\n");
 
