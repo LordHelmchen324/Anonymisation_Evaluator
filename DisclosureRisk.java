@@ -67,7 +67,7 @@ class DisclosureRisk {
             if (expectedClosest != null && expectedClosest == pair[1].id) linkedCount++;
         }
 
-        return linkedCount / lps.length;
+        return (double)linkedCount / (double)lps.length;
     }
 
 }
