@@ -23,6 +23,7 @@ class InformationLoss {
         int computed = 1;
         for (Trajectory ro : o.getTrajectories()) {
             System.out.print("\rInformation loss: Computing IL_1.1 ... " + (computed * 100 / o.size()) + "%");
+            computed++;
 
             Trajectory rp = p.getTrajectoryById(ro.id);
             if (rp == null) {
@@ -45,8 +46,6 @@ class InformationLoss {
             if (b2 != 0) b = b1 / b2; 
 
             sum += a + b;
-
-            computed++;
         }
         System.out.print("\n");
 
