@@ -51,6 +51,8 @@ public class Evaluator {
 
 		for (String mSString : medianStrategyStrings) {
 			for (int k : ks) {
+				System.out.println("Starting evaluation for sync / " + mSString + " / " + k + " ...");
+
 				Dataset p = Dataset.fromJSON("../San Francisco Taxi Data/CabSpotting_pandas-downsampled_PROTECTED_sync_" + mSString + "_k" + k + ".json");
 
 				double dr = DisclosureRisk.computeViaRecordLinkage(o, p);
