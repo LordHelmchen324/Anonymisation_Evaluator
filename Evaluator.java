@@ -14,7 +14,7 @@ public class Evaluator {
 		int[] ks = { 2, 3, 6, 9, 12, 15, 20, 30 };
 
 		// Artifical data set
-
+		
 		System.out.println("----- Starting evaluation of the artificial data set ...");
 
 		Dataset o = Dataset.fromJSON("../Perfect Data Set/perfect_grid_1000_60_2000_2000.json");
@@ -40,7 +40,7 @@ public class Evaluator {
 		}
 
 		Evaluator.ResultRecord.resultsToFile(results, "../Perfect Data Set/evaluation_results.csv");
-
+		
 		// Real data set
 
 		System.out.println("----- Starting evaluation of the real data set ...");
@@ -99,7 +99,7 @@ public class Evaluator {
 				System.exit(1);
 			}
 
-			System.out.print("\rWrote results to file     \n");
+			System.out.print("\rWrote results to file           \n");
 		}
 	}
 
